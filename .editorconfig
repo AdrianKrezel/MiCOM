@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS0017: Program has more than one entry point defined. Compile with /main to specify the type that contains the entry point.
+dotnet_diagnostic.CS0017.severity = error
