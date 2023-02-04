@@ -7,8 +7,10 @@ namespace MySample.Micom
 {
    public interface IMicom
     { 
-        List<DisturbanceEvent> AllEvents { get; }
-        List<ushort[]> AllEventsRawValues { get; set; }
+        List<DisturbanceEvent> AllEvents 
+        { get; }
+        List<ushort[]> AllEventsRawValues 
+        { get; set; }
 
         void GetAllEvents();
         void GetEventInfo(ushort[] singleEvent, out string eventType, out string eventMeaning);

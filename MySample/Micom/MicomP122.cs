@@ -15,8 +15,15 @@ namespace MySample.Micom
     /// </summary>
     public class MicomP122 : IMicom
     {
-        public List<ushort[]> AllEventsRawValues { get { return allEventsRawValues; } set { allEventsRawValues = value; } }
-        public List<DisturbanceEvent> AllEvents { get { return allEvents; } }
+        public List<ushort[]> AllEventsRawValues 
+        { 
+            get { return allEventsRawValues; } 
+            set { allEventsRawValues = value; } 
+        }
+        public List<DisturbanceEvent> AllEvents 
+        { 
+            get { return allEvents; } 
+        }
 
         private string eventType;
         private string eventMeaning;
@@ -24,8 +31,8 @@ namespace MySample.Micom
         private List<ushort[]> allEventsRawValues;
         private List<DisturbanceEvent> allEvents;
 
-        private String[] allEventsToDisplay_CSV;
-        private String[] allEventsToDisplay_TXT;
+        private String[] allEventsToSave_CSV;
+        private String[] allEventsToSave_TXT;
 
         /// <summary>
         /// Creates instance of MiCOM device
@@ -36,8 +43,8 @@ namespace MySample.Micom
             this.allEventsRawValues = allEventsRawValues;
             de = new DisturbanceEvent();
             allEvents = new List<DisturbanceEvent>();
-            allEventsToDisplay_CSV = new String[allEventsRawValues.Count + 1];
-            allEventsToDisplay_TXT = new String[allEventsRawValues.Count + 1];
+            allEventsToSave_CSV = new String[allEventsRawValues.Count + 1];
+            allEventsToSave_TXT = new String[allEventsRawValues.Count + 1];
             GetAllEvents();
         }
 
@@ -47,22 +54,22 @@ namespace MySample.Micom
         /// <param name="fieldNumber">Number of the field in the switchgear</param>
         public void SaveToTextFile(ushort fieldNumber)
         {
-            ProcessToDisplay();
+            ProcessDataToSave();
 
-            //path
+            // Path
             DateTime dt = DateTime.Now;
             string displayTime = $"{dt.Year}{dt.Month}{dt.Day}_{dt.Hour}{dt.Minute}{dt.Second}";
             string fn = ((int)fieldNumber).ToString();
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
             string pathcsv = $"{desktopPath}\\CSV_R8-MiCOM-field{fn}_{displayTime}.csv";
             string pathtxt = $"{desktopPath}\\TXT_R8-MiCOM-field{fn}_{displayTime}.txt";
             try
             {
-                File.WriteAllLines(pathcsv, allEventsToDisplay_CSV);
-                File.WriteAllLines(pathtxt, allEventsToDisplay_TXT);
+                File.WriteAllLines(pathcsv, allEventsToSave_CSV);
+                File.WriteAllLines(pathtxt, allEventsToSave_TXT);
 
-                Console.WriteLine("\nEVENTS SAVED TO FILES:---------------------------------------------------------------------------------------------------------");
+                //INFO***
+                Console.WriteLine("\nEVENTS SAVED TO FILES:------------------------------------------------------------------------------------------------------------------------------");
                 Console.WriteLine($"\nFile with events saved as *.TXT to:\n   {pathtxt}");
                 Console.WriteLine($"\nFile with events saved as *.CSV to:\n   {pathcsv}");
             }
@@ -75,43 +82,35 @@ namespace MySample.Micom
         /// <summary>
         /// Prepare events data to be displayed for user
         /// </summary>
-        private void ProcessToDisplay()
+        private void ProcessDataToSave()
         {
-            String[] header = { "No.", "EventTime", "EventCode", "EventMeaning", "EventType", "EventValue", "Acknowledged" };
-            int[] columnWidth = { 5, 25, 12, 50, 12, 12, 20 };
+            Console.WriteLine("\nMiCOM EVENTS:---------------------------------------------------------------------------------------------------------------------------------------");
+            String[] h = { "No.", "EventTime", "EventCode", "EventMeaning", "EventType", "EventValue", "Acknowledged" };
+            int[] cw = { 5, 25, 12, 70, 12, 12, 20 };
+
+            PrepareCSVFile(header: h);
+            PrepareTXTFile(header: h, columnWidth: cw);
+        }
+
+        /// <summary>
+        /// Prepares data to be saved as TXT file
+        /// </summary>
+        /// <param name="header">Columns headers names</param>
+        /// <param name="columnWidth">Columns width</param>
+        private void PrepareTXTFile(String[] header, int[] columnWidth)
+        {
             for (int i = 0; i < allEvents.Count; i++)
             {
-                if (i == 0)//headers
+                if (i == 0) //TXT header
                 {
-                    Console.WriteLine("\nMiCOM EVENTS:------------------------------------------------------------------------------------------------------------------");
                     for (int h = 0; h < header.Length; h++)
-                    {
-                        //CSV header
-                        if (h < header.Length - 1)
-                            allEventsToDisplay_CSV[i] += $"{header[h]};";
-                        else
-                            allEventsToDisplay_CSV[i] += $"{header[h]}";
-
-                        //TXT header
-                        allEventsToDisplay_TXT[i] += $"{header[h]}".PadRight(columnWidth[h]);                       
-                    }
+                        allEventsToSave_TXT[i] += $"{header[h]}".PadRight(columnWidth[h]);
                 }
-                else//file data body
+                else//file body
                 {
                     string index = i.ToString("000");
 
-                    //CSV body
-                    allEventsToDisplay_CSV[i] = String.Concat(
-                    $"{index};" +
-                    $"{allEvents[i].EventTime};" +
-                    $"{allEvents[i].EventCode};" +
-                    $"{allEvents[i].EventMeaning};" +
-                    $"{allEvents[i].EventType};" +
-                    $"{allEvents[i].ModbusAssociatedValue};" +
-                    $"{allEvents[i].Acknowledged}");
-
-                    //TXT body
-                    allEventsToDisplay_TXT[i] = String.Concat(
+                    allEventsToSave_TXT[i] = String.Concat(
                     $"{index}".PadRight(columnWidth[0]) +
                     $"{allEvents[i].EventTime}".PadRight(columnWidth[1]) +
                     $"{allEvents[i].EventCode}".PadRight(columnWidth[2]) +
@@ -120,7 +119,43 @@ namespace MySample.Micom
                     $"{allEvents[i].ModbusAssociatedValue}".PadRight(columnWidth[5]) +
                     $"{allEvents[i].Acknowledged}".PadRight(columnWidth[6]));
 
-                    Console.WriteLine(allEventsToDisplay_TXT[i]);
+                    //INFO***
+                    Console.WriteLine(allEventsToSave_TXT[i]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Prepares data to be saved as CSV file
+        /// </summary>
+        /// <param name="header">Columns headers names</param>
+        private void PrepareCSVFile(String[] header)
+        {
+            for (int i = 0; i < allEvents.Count; i++)
+            {
+                if (i == 0)//CSV header
+                {
+                    for (int h = 0; h < header.Length; h++)
+                    {
+                        if (h < header.Length - 1)
+                            allEventsToSave_CSV[i] += $"{header[h]};";
+                        else
+                            allEventsToSave_CSV[i] += $"{header[h]}";
+                    }
+                }
+                else // file body
+                {
+                    string index = i.ToString("000");
+
+                    // body
+                    allEventsToSave_CSV[i] = String.Concat(
+                    $"{index};" +
+                    $"{allEvents[i].EventTime};" +
+                    $"{allEvents[i].EventCode};" +
+                    $"{allEvents[i].EventMeaning};" +
+                    $"{allEvents[i].EventType};" +
+                    $"{allEvents[i].ModbusAssociatedValue};" +
+                    $"{allEvents[i].Acknowledged}");
                 }
             }
         }

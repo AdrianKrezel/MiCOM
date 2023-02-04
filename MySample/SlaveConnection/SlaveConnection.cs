@@ -12,9 +12,16 @@ namespace MySample
     /// </summary>
     internal class SlaveConnection
     {
+        public TcpClient Client 
+        { 
+            get { return client; } 
+            set { client = value; } 
+        }
+
         private String ipAddress;
         private ushort port, slaveId;
         private ModbusIpMaster master;
+        private TcpClient client;
         private List<ushort[]> allEventsRawValues = new List<ushort[]>();
 
         /// <summary>
@@ -40,7 +47,7 @@ namespace MySample
                 TcpClient client = new TcpClient(ipAddress, port);
                 this.master = ModbusIpMaster.CreateIp(client);
             }
-                        catch (Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("LOG | Device.cs: Error during connection to slave device /n" + e.Message);
             }
@@ -53,8 +60,18 @@ namespace MySample
         /// <param name="startRegister">1st Modbus register to be read</param>
         /// <param name="length">Number of consecutive registers to be read</param>
         /// <returns>List of events as raw values</returns>
-        public List<ushort[]> GetData(ushort startRegister = 13568, ushort length = 9) //MiCOM P122!!
+        public List<ushort[]> GetData(SlaveDevice sd) //MiCOM P122!!
         {
+            ushort startRegister=0, length=0;
+
+            switch (sd.MicomModel)
+            {
+                case MicomModel.P122: startRegister=13569; length = 9; break;
+                case MicomModel.P123: startRegister = 13569; length = 9; break;
+                //case MicomModel.P922: startRegister = 999999; length = 999999; break;
+            }
+
+
             ushort i = 0;
             while (true)
             {
