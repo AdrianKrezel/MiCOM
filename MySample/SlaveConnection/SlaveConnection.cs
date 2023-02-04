@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Reflection;
 
 namespace MySample
 {
@@ -11,26 +12,27 @@ namespace MySample
     /// </summary>
     internal class SlaveConnection
     {
-        public List<ushort[]> AllEventsRawValues { get { return allEventsRawValues; } }
-
         private String ipAddress;
         private ushort port, slaveId;
-        private List<ushort[]> allEventsRawValues = new List<ushort[]>();
         private ModbusIpMaster master;
+        private List<ushort[]> allEventsRawValues = new List<ushort[]>();
 
-        public SlaveConnection(SlaveAddress slaveAddress)
+        /// <summary>
+        /// Creates instance of Modbus connection to slave device and gets data from registers
+        /// </summary>
+        /// <param name="slaveAddress">Parameter that contains IP, port and ID information</param>
+        public SlaveConnection(SlaveDevice slaveAddress)
         {
             this.ipAddress = slaveAddress.IpAddress;
             this.port = slaveAddress.Port;
             this.slaveId = slaveAddress.SlaveId;
-
             master = Connect();
         }
 
         /// <summary>
         /// Connects to slave device
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Modbus Master connection</returns>
         private ModbusIpMaster Connect()
         {
             try
@@ -38,34 +40,40 @@ namespace MySample
                 TcpClient client = new TcpClient(ipAddress, port);
                 this.master = ModbusIpMaster.CreateIp(client);
             }
-            catch (Exception e)
+                        catch (Exception e)
             {
                 Console.WriteLine("LOG | Device.cs: Error during connection to slave device /n" + e.Message);
             }
             return master;
         }
 
-
         /// <summary>
         /// Gets all of events from MiCOM P122 device as registers values
         /// </summary>
-        /// <param name="startAddr">1st Modbus register to be read</param>
+        /// <param name="startRegister">1st Modbus register to be read</param>
         /// <param name="length">Number of consecutive registers to be read</param>
-        /// <returns>List of events as "rare" values</returns>
-        public List<ushort[]> GetEventsRawRegistersValues(ushort startAddr = 13569, ushort length = 9)
+        /// <returns>List of events as raw values</returns>
+        public List<ushort[]> GetData(ushort startRegister = 13568, ushort length = 9) //MiCOM P122!!
         {
             ushort i = 0;
             while (true)
             {
-                ushort[] ev = this.master.ReadHoldingRegisters(slaveAddress: (byte)slaveId, startAddress: (ushort)(startAddr + i), numberOfPoints: length);
-
-                if (ev[0] != 0) allEventsRawValues.Add(ev); // event found -> add event to list of events
-                else break;                        // finised -> no more events found
-                i++;
+                try
+                {
+                    ushort[] ev = this.master.ReadHoldingRegisters(slaveAddress: (byte)slaveId, startAddress: (ushort)(startRegister + i), numberOfPoints: length);
+                    if (ev[0] == 0) break;            // finished -> no more events found
+                    else allEventsRawValues.Add(ev);  // event found -> add event to the list of events                       
+                    i++;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"LOG | SlaveConnection.cs: {e.Message}");
+                    break;
+                }
             }
+
             return this.allEventsRawValues;
         }
-        
     }
 }
 

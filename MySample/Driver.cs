@@ -1,3 +1,4 @@
+using MySample.Micom;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -11,55 +12,38 @@ namespace MySample
     {
         static void Main(String[] args)
         {
+            Console.WriteLine("START MiCOM CONNECTION---------------------------------------------------------------------------------------------------------");
             try
-            {   
+            {
                 //1. Select MiCOM (ModbusTCP over RTU device)
-                SlaveAddress sa = new SlaveAddress(device: 0);
-                Console.WriteLine("1.OK");
+                SlaveDevice sd = new SlaveDevice(selected: 0); // Localhost ModSim for application tests
 
-                //2. Get connection to selected MiCOM device
-                SlaveConnection sc = new SlaveConnection(slaveAddress: sa);
-                Console.WriteLine("2.OK");
+                //2. Get connection to selected MiCOM device and get data
+                SlaveConnection sc = new SlaveConnection(slaveAddress: sd);
+                List<ushort[]> aerv = sc.GetData();  
+                
+                //3. Convert downloaded data
+                var micomFactory = new MicomFactory();
+                IMicom micom = micomFactory.GetMicom(model:sd.MicomModel, allEventsRawValues:aerv);
 
-                //3. Get list of all events from single selected MiCOM as Modbus register values
-                List<ushort[]> allEventsRawValues = sc.GetEventsRawRegistersValues();
-                Console.WriteLine("3.OK");
+                //4. Save data to text file
+                micom.SaveToTextFile(sd.SlaveId);
 
-                //4. Single event interpretation
-                Micom m = new MicomP122(allEventsRawValues); // default device
-                switch (sa.MicomModel)
-                {
-                    case MicomModel.P122: m = new MicomP122(allEventsRawValues); break;
-                    case MicomModel.P123: m = new MicomP122(allEventsRawValues); break;
-                        //case MicomModel.P922: m = new MicomP922(eventsValues); break;
-                }
-
-                m.GetEventCode();
-
-                foreach (ushort[] item in allEventsRawValues)
-                {
-
-                    //Console.WriteLine($"Event: {m.EventCode}; {m.EventDescription}; {m.EventType}; "); 
-                }
-
-                Console.WriteLine("4.OK");
-
-
-
-
-                // RESULT PRINTING
-                Console.WriteLine("\nNETWORK:------------------------------");
-                Console.WriteLine($"IP address = {sa.IpAddress}");
-                Console.WriteLine($"Port = {sa.Port}");
-                Console.WriteLine($"ID = {sa.SlaveId}");
-                Console.WriteLine($"Model = {sa.MicomModel}");
-                Console.WriteLine("\n\nFinished. Press any key to finish...");
+                //LOGS
+                Console.WriteLine("\nDEVICE INFORMATION:-----------------------------------------------------------------------------------------------------------");
+                Console.WriteLine($"R6kV-R8-MiCOM-field: {sd.SlaveId}");
+                Console.WriteLine($"   IP address = {sd.IpAddress}");
+                Console.WriteLine($"   Port = {sd.Port}");
+                Console.WriteLine($"   Slave ID = {sd.SlaveId}");
+                Console.WriteLine($"   Model = {sd.MicomModel}");
+                Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("\nFinished. Press ENTER key to finish...");
                 Console.ReadLine();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine($"LOG | Exception {0}", ex);
-                Console.WriteLine("Press any key to finish...");
+                Console.WriteLine($"LOG | ERROR: {e.Message}");
+                Console.WriteLine("Press ENTER key to finish...");
                 Console.ReadLine();
             }
         }

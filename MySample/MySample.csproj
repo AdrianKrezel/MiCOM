@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MySample</RootNamespace>
     <AssemblyName>MySample</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -17,7 +17,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
-    <PublishUrl>publish\</PublishUrl>
+    <PublishUrl>C:\Users\E1251437\OneDrive - Emerson\Desktop\vspublish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -27,9 +27,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationRevision>6</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -73,6 +74,18 @@
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>41374114BC3FDEC13C689DE6E06946E2871B86BC</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>MySample_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -85,16 +98,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Event.cs" />
-    <Compile Include="MicomModel.cs" />
-    <Compile Include="Micom.cs" />
-    <Compile Include="DateAndTime.cs" />
+    <Compile Include="DisturbanceEvent.cs" />
     <Compile Include="Driver.cs" />
-    <Compile Include="MicomP122.cs" />
+    <Compile Include="MappingFormat\MappingFormatFactory.cs" />
+    <Compile Include="MappingFormat\MappingFormatMicomP922.cs" />
+    <Compile Include="MappingFormat\MappingFormatMicomP122.cs" />
+    <Compile Include="MappingFormat\IMappingFormat.cs" />
+    <Compile Include="Micom\MicomP922.cs" />
+    <Compile Include="Micom\MicomFactory.cs" />
+    <Compile Include="Micom\MicomP122.cs" />
+    <Compile Include="Micom\IMicom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SlaveConnection.cs" />
-    <Compile Include="SlaveAddress.cs" />
-    <Compile Include="SlaveModel.cs" />
+    <Compile Include="SlaveConnection\SlaveConnection.cs" />
+    <Compile Include="SlaveDevices\SlaveDevice.cs" />
+    <Compile Include="Micom\MicomModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FtdAdapter\FtdAdapter.csproj">
@@ -108,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="MySample_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

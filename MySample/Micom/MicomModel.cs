@@ -6,9 +6,9 @@ using System.Text;
 namespace MySample
 {
     /// <summary>
-    /// Micom models list supported by this software
+    /// Enumeration of Micom devices supported
     /// </summary>
-    enum MicomModel
+    public enum MicomModel
     {
         P122,
         P123,
