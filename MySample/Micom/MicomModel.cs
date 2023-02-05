@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MySample
+﻿namespace MySample
 {
     /// <summary>
     /// Enumeration of Micom devices supported
     /// </summary>
+    /// <returns>Selected model of MiCOM device</returns>
     public enum MicomModel
     {
         P122,

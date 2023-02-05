@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
-using System.Text;
 
 namespace MySample
 {
     /// <summary>
     /// Class that represents single disturbance event data structure
     /// </summary>
+    /// <returns>Disturbance Event instance</returns>
     public class DisturbanceEvent
     {
         public ushort EventCode 

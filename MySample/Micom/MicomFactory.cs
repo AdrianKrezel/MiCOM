@@ -5,6 +5,7 @@ namespace MySample.Micom
     /// <summary>
     /// Class for selecting Micom model
     /// </summary>
+    /// <returns>Instance of MiCOM device</returns>
     public class MicomFactory
     {
         /// <summary>

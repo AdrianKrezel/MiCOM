@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Xml.Schema;
 using System.IO;
-using static log4net.Appender.RollingFileAppender;
 
 namespace MySample.Micom
 {
     /// <summary>
     /// Class to decode all off the disturbance events for MiCOM P122
     /// </summary>
+    /// <returns>MiCOM P122 instance</returns>
     public class MicomP122 : IMicom
     {
         public List<ushort[]> AllEventsRawValues 

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Reflection;
 
 namespace MySample
 {
@@ -10,7 +9,8 @@ namespace MySample
     /// Class used for device connection to MiCOM P122 and getting 
     /// raw values from Modbus registers
     /// </summary>
-    internal class SlaveConnection
+    /// <returns>Single Master-Slave connection instance</returns>
+    class SlaveConnection
     {
         public TcpClient Client 
         { 
